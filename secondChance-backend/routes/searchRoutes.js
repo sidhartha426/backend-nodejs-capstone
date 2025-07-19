@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Search for gifts
 router.get('/', async (req, res, next) => {
-    try {
+try {
         const db = await connectToDatabase();
         const collection = db.collection(process.env.MONGO_COLLECTION);
         // Initialize the query object

@@ -9,11 +9,11 @@ let dbInstance = null;
 const dbName = `${process.env.MONGO_DB}`;
 
 async function connectToDatabase() {
-    if (dbInstance){
+    if (dbInstance) {
         return dbInstance;
     };
 
-    const client = new MongoClient(url);      
+    const client = new MongoClient(url);
 
     // Task 1: Connect to MongoDB
     await client.connect();
