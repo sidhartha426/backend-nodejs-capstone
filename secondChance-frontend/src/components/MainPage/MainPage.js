@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {urlConfig} from '../../config';
+import { urlConfig } from '../../config';
 import { useAppContext } from '../../context/AppContext';
 
 function MainPage() {
@@ -49,17 +49,17 @@ function MainPage() {
     return (
         <div className="container mt-5">
             {isLoggedIn ? (
-              <button onClick={handleAddItem}>Add Item</button>
+                <button className="btn btn-primary w-25" onClick={handleAddItem}>Add Item</button>
             ) : (
                 null
             )}
-        <div className="row">
+            <div className="row">
                 {items.map((item) => (
                     <div key={item.id} className="col-md-4 mb-4">
                         <div className="card product-card">
                             <div className="image-placeholder">
                                 {item.image ? (
-                                    <img src={urlConfig.backendUrl+item.image} alt={item.name} />                                ) : (
+                                    <img src={urlConfig.backendUrl + item.image} alt={item.name} />) : (
                                     <div className="no-image-available">No Image Available</div>
                                 )}
                             </div>

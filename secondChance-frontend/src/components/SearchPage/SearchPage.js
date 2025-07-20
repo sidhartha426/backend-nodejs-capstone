@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {urlConfig} from '../../config';
+import { urlConfig } from '../../config';
 
 function SearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -56,8 +56,8 @@ function SearchPage() {
 
     const navigate = useNavigate();
 
-    const goToDetailsPage = (productId) => {
-        navigate(`/app/product/${productId}`);
+    const goToDetailsPage = (itemId) => {
+        navigate(`/app/item/${itemId}`);
     };
 
 
@@ -115,7 +115,7 @@ function SearchPage() {
                             searchResults.map(product => (
                                 <div key={product.id} className="card mb-3">
                                     {/* Check if product has an image and display it */}
-                                    <img src={urlConfig.backendUrl+product.image} alt={product.name} className="card-img-top" />
+                                    <img src={urlConfig.backendUrl + product.image} alt={product.name} className="card-img-top" />
                                     <div className="card-body">
                                         <h5 className="card-title">{product.name}</h5>
                                         <p className="card-text">{product.description.slice(0, 100)}...</p>

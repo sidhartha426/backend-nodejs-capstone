@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {urlConfig} from '../../config';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { urlConfig } from '../../config';
 import { useAppContext } from '../../context/AppContext';
 
 import './LoginPage.css';
@@ -9,51 +9,55 @@ function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [incorrect, setIncorrect] = useState('');
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
     const bearerToken = sessionStorage.getItem('bearer-token');
     const { setIsLoggedIn } = useAppContext();
 
     useEffect(() => {
         if (sessionStorage.getItem('auth-token')) {
-          navigate('/app')
+            navigate('/app')
         }
-      }, [navigate])
+    }, [navigate])
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
         //api call
         const res = await fetch(`${urlConfig.backendUrl}/api/auth/login`, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'Authorization': bearerToken ? `Bearer ${bearerToken}` : '', // Include Bearer token if available
-          },
-          body: JSON.stringify({    
-            email: email,
-            password: password,
-          })
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'Authorization': bearerToken ? `Bearer ${bearerToken}` : '', // Include Bearer token if available
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password,
+            })
         });
-    
-        const json = await res.json();
-        console.log('Json',json);
-        if (json.authtoken) {
-          sessionStorage.setItem('auth-token', json.authtoken);
-          sessionStorage.setItem('name', json.userName);
-          sessionStorage.setItem('email', json.userEmail);
 
-          navigate('/app');
-          setIsLoggedIn(true);
+        const json = await res.json();
+        console.log('Json', json);
+        if (json.authtoken) {
+            sessionStorage.setItem('auth-token', json.authtoken);
+            sessionStorage.setItem('name', json.userName);
+            sessionStorage.setItem('email', json.userEmail);
+
+            navigate('/app');
+            setIsLoggedIn(true);
         } else {
-          document.getElementById("email").value="";
-          document.getElementById("password").value="";
-          setIncorrect("Wrong password. Try again.");
-          setTimeout(() => {
-            setIncorrect("");
-          }, 2000);
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+            setIncorrect("Wrong password. Try again.");
+            setTimeout(() => {
+                setIncorrect("");
+            }, 2000);
         }
-    
-      }
-    
+        setLoading(false);
+
+    }
+
 
     return (
         <div className="container mt-5">
@@ -63,30 +67,40 @@ function LoginPage() {
                         <h2 className="text-center mb-4 font-weight-bold">Login</h2>
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label">Email</label>
-                            <input 
+                            <input
                                 id="email"
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter your email"
                                 value={email}
-                                onChange={(e) => {setEmail(e.target.value); setIncorrect("")}}
+                                onChange={(e) => { setEmail(e.target.value); setIncorrect("") }}
                             />
                         </div>
                         <div className="mb-4">
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input 
+                            <input
                                 id="password"
                                 type="password"
                                 className="form-control"
                                 placeholder="Enter your password"
                                 value={password}
-                                onChange={(e) => {setPassword(e.target.value);setIncorrect("")}}
+                                onChange={(e) => { setPassword(e.target.value); setIncorrect("") }}
                             />
-                            <span style={{color:'red',height:'.5cm',display:'block',fontStyle:'italic',fontSize:'12px'}}>{incorrect}</span>
+                            <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>
                         </div>
-                        <button className="btn btn-primary w-100 mb-3" onClick={handleLogin}>Login</button>
+                        <button disabled={loading} className="btn btn-primary w-100 mb-3" onClick={handleLogin}>
+                            {loading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Logging In...
+                                </>
+                            ) : (
+                                'Login'
+                            )}
+
+                        </button>
                         <p className="mt-4 text-center">
-                            New here? <a href="/app/register" className="text-primary">Register Here</a>
+                            New here? <Link to="/app/register" className="text-primary">Register Here</Link>
                         </p>
                     </div>
                 </div>
