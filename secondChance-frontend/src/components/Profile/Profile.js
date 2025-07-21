@@ -7,11 +7,12 @@ import { useAppContext } from '../../context/AppContext';
 const Profile = () => {
     const [userDetails, setUserDetails] = useState({});
     const [updatedDetails, setUpdatedDetails] = useState({});
-    const { setUserName } = useAppContext();
     const [changed, setChanged] = useState("");
-
     const [editMode, setEditMode] = useState(false);
+
+    const { setUserName } = useAppContext();
     const navigate = useNavigate();
+
     useEffect(() => {
         const authtoken = sessionStorage.getItem("auth-token");
         if (!authtoken) {
@@ -29,7 +30,8 @@ const Profile = () => {
             if (name || authtoken) {
                 const storedUserDetails = {
                     name: name,
-                    email: email
+                    email: email,
+                    password: ""
                 };
 
                 setUserDetails(storedUserDetails);
@@ -63,6 +65,18 @@ const Profile = () => {
                 return;
             }
 
+            let message = "";
+
+            if (userDetails.name !== updatedDetails.name && updatedDetails.password !== "") {
+                message = "Name and Password";
+            }
+            else if (userDetails.name !== updatedDetails.name) {
+                message = "Name";
+            }
+            else if (updatedDetails.password !== "") {
+                message = "Password";
+            }
+
             const payload = { ...updatedDetails };
             const response = await fetch(`${urlConfig.backendUrl}/api/auth/update`, {
                 method: "PUT",
@@ -76,16 +90,24 @@ const Profile = () => {
 
             if (response.ok) {
                 // Update the user details in session storage
+                const json = await response.json();
                 sessionStorage.setItem("name", updatedDetails.name);
-                setUserDetails(updatedDetails);
+                sessionStorage.setItem('auth-token', json.authtoken);
+
                 setEditMode(false);
                 setUserName(updatedDetails.name);
+                setUpdatedDetails((prevState) => ({
+                    ...prevState,
+                    password: "",
+                }));
+                setUserDetails(updatedDetails);
+
                 // Display success message to the user
-                setChanged("Name Changed Successfully!");
+                setChanged(`${message} Changed Successfully!`);
                 setTimeout(() => {
                     setChanged("");
                     navigate("/");
-                }, 1000);
+                }, 3000);
 
             } else {
                 // Handle error case
@@ -119,6 +141,16 @@ const Profile = () => {
                             onChange={handleInputChange}
                         />
                     </label>
+                    <label>
+                        Password
+                        <input
+                            type="password"
+                            name="password"
+                            value={updatedDetails.password}
+                            onChange={handleInputChange}
+                        />
+                    </label>
+
 
                     <button type="submit">Save</button>
                 </form>

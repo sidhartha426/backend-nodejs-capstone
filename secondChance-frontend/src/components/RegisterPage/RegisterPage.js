@@ -95,7 +95,7 @@ function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
-                            {showerr && (
+                            {showerr==="Email id already exists" && (
                                 <div className="text-danger">{showerr}</div>
                             )}
                         </div>

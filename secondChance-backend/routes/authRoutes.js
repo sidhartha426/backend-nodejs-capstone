@@ -116,6 +116,11 @@ router.put('/update', async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
         existingUser.firstName = req.body.name;
+        if (req.body.password) {
+            const salt = await bcryptjs.genSalt(10);
+            const hash = await bcryptjs.hash(req.body.password, salt);
+            existingUser.password = hash;
+        }
         existingUser.updatedAt = new Date();
         //Task 6: Update user credentials in DB
         const updatedUser = await collection.findOneAndUpdate(

@@ -49,7 +49,7 @@ function LoginPage() {
         } else {
             document.getElementById("email").value = "";
             document.getElementById("password").value = "";
-            setIncorrect("Wrong password. Try again.");
+            setIncorrect(json.error);
             setTimeout(() => {
                 setIncorrect("");
             }, 2000);
@@ -75,6 +75,8 @@ function LoginPage() {
                                 value={email}
                                 onChange={(e) => { setEmail(e.target.value); setIncorrect("") }}
                             />
+                            {incorrect === "User not found" &&
+                            <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>}
                         </div>
                         <div className="mb-4">
                             <label htmlFor="password" className="form-label">Password</label>
@@ -86,7 +88,8 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => { setPassword(e.target.value); setIncorrect("") }}
                             />
-                            <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>
+                            {incorrect === "Wrong pasword" &&
+                            <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>}
                         </div>
                         <button disabled={loading} className="btn btn-primary w-100 mb-3" onClick={handleLogin}>
                             {loading ? (

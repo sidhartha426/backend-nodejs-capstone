@@ -22,7 +22,8 @@
 }
 
 .profile-container input[type="text"],
-.profile-container input[type="email"] {
+.profile-container input[type="email"],
+.profile-container input[type="password"]{
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;

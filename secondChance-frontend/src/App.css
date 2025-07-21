@@ -211,6 +211,10 @@ body,
     transition: background-color 0.2s ease-in-out;
 }
 
+.nav-link.login-btn{
+    margin-right: 10px;
+}
+
 .nav-link.login-btn:hover,
 .nav-link.login-btn:focus,
 .nav-link.register-btn:hover,
