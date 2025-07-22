@@ -1,9 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-// const axios = require('axios');
 const logger = require('./logger');
 const expressPino = require('express-pino-logger')({ logger });
-const natural = require("natural");
+const natural = require('natural');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,7 +14,6 @@ app.use(expressPino);
 app.get('/sentiment', async (req, res) => {
     const { sentence } = req.query;
 
-
     if (!sentence) {
         logger.error('No sentence provided');
         return res.status(400).json({ error: 'No sentence provided' });
@@ -24,24 +22,24 @@ app.get('/sentiment', async (req, res) => {
     // Initialize the sentiment analyzer with the Natural's PorterStemmer and "English" language
     const Analyzer = natural.SentimentAnalyzer;
     const stemmer = natural.PorterStemmer;
-    const analyzer = new Analyzer("English", stemmer, "afinn");
+    const analyzer = new Analyzer('English', stemmer, 'afinn');
 
     // Perform sentiment analysis
     try {
         const analysisResult = analyzer.getSentiment(sentence.split(' '));
 
-        let sentiment = "neutral";
+        let sentiment = 'neutral';
 
         if (analysisResult < 0) {
-            sentiment = "negative";
+            sentiment = 'negative';
         } else if (analysisResult > 0.33) {
-            sentiment = "positive";
+            sentiment = 'positive';
         }
 
         // Logging the result
         logger.info(`Sentiment analysis result: ${analysisResult}`);
         // Responding with the sentiment analysis result
-        res.status(200).json({ sentimentScore: analysisResult, sentiment: sentiment });
+        res.status(200).json({ sentimentScore: analysisResult, sentiment });
     } catch (error) {
         logger.error(`Error performing sentiment analysis: ${error}`);
         res.status(500).json({ message: 'Error performing sentiment analysis' });
