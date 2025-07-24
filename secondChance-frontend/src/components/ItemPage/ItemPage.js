@@ -39,12 +39,12 @@ function ItemPage() {
         formData.append('age_years', (age_days / 365).toFixed(2));
         formData.append('description', document.getElementById('description').value);
         formData.append('image', `/images/${file.name}`);
-        if (comment === '') {
+        if (comment.trim() === '') {
             formData.append('comments', JSON.stringify([]));
         }
         else {
             const author = `${sessionStorage.getItem('name')} ${sessionStorage.getItem('surname')}`;
-            formData.append('comments', JSON.stringify([{ author, comment }]));
+            formData.append('comments', JSON.stringify([{ author, comment: comment.trim() }]));
         }
 
 
@@ -168,7 +168,7 @@ function ItemPage() {
                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                     Adding Item...
                                 </>
-                            ):('Add Item')}
+                            ) : ('Add Item')}
                         </button>
 
                         <span style={{ color: 'green', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{message}</span>

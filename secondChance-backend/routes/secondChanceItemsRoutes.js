@@ -3,6 +3,8 @@ const multer = require('multer');
 const router = express.Router();
 const connectToDatabase = require('../models/db');
 const logger = require('../logger');
+const fs = require('fs').promises;
+
 
 // Define the upload directory path
 const directoryPath = 'public/images';
@@ -157,6 +159,7 @@ router.delete('/:id', async (req, res, next) => {
             return res.status(404).json({ error: 'secondChanceItem not found' });
         }
         await collection.deleteOne({ id });
+        await fs.unlink('public'+secondChanceItem.image);
 
         res.json({ deleted: 'success' });
     } catch (e) {

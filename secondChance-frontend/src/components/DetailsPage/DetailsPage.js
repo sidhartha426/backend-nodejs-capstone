@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { urlConfig } from "../../config"
 import { useAppContext } from '../../context/AppContext';
@@ -11,42 +11,74 @@ function DetailsPage() {
     const [gift, setGift] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
+    const [comment, setComment] = useState('');
     const { isLoggedIn } = useAppContext();
 
+    const fetchItem = useCallback(async () => {
+        try {
+            const response = await fetch(`${urlConfig.backendUrl}/api/secondchance/items/${itemId}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setGift(data);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [itemId]);
 
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('/app/login')
         }
-
         // Scroll to top on component mount
         window.scrollTo(0, 0);
-
-        // get the gift to be rendered on the details page
-        const fetchItem = async () => {
-            try {
-                const response = await fetch(`${urlConfig.backendUrl}/api/secondchance/items/${itemId}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setGift(data);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchItem();
         window.scrollTo(0, 0);
-    }, [itemId, isLoggedIn, navigate]);
+    }, [itemId, isLoggedIn, navigate, fetchItem]);
 
     const handleBackClick = () => {
         navigate(-1); // Navigates back to the previous page
     };
 
+    const handleAddComment = async () => {
+        if (!comment.trim()) return;
+
+        try {
+            setCommentLoading(true);
+            const res = await fetch(`${urlConfig.backendUrl}/api/secondchance/items/${gift.id}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    author: `${sessionStorage.getItem('name')} ${sessionStorage.getItem('surname')}`,
+                    comment: comment.trim(),
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to post comment');
+            }
+
+            await res.json();
+            await fetchItem();
+            setComment('');
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setCommentLoading(false);
+        }
+
+    };
+
     const handleDeleteClick = async () => {
+        setDeleteLoading(true);
         const response = await fetch(`${urlConfig.backendUrl}/api/secondchance/items/${itemId}`, {
             method: 'DELETE'
         });
@@ -54,6 +86,7 @@ function DetailsPage() {
             throw new Error('Network response was not ok');
         }
         await response.json();
+        setDeleteLoading(false);
         navigate(-1); // Navigates back to the previous page
     };
 
@@ -65,7 +98,17 @@ function DetailsPage() {
         <div className="container mt-5">
             <div className="d-flex justify-content-between mb-3">
                 <button className="btn btn-secondary" onClick={handleBackClick}>Back</button>
-                <button className="btn btn-danger" onClick={handleDeleteClick}>Delete</button>
+                <button disabled={deleteLoading} className="btn btn-danger" onClick={handleDeleteClick}>
+                    {
+                        deleteLoading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Deleting...
+                            </>
+                        ) : ("Delete")
+
+                    }
+                </button>
             </div>
             <div className="card product-details-card">
                 <div className="card-header text-white">
@@ -97,7 +140,37 @@ function DetailsPage() {
                         </div>
                     </div>
                 ))}
+                <div className="card mt-4">
+                    <div className="card-body">
+                        <div className="mb-3">
+                            <label htmlFor="comment" className="form-label">Comment</label>
+                            <textarea
+                                id="comment"
+                                cols="2"
+                                className="form-control"
+                                placeholder="Enter the comment"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                        </div>
+
+                        <button
+                            disabled={commentLoading}
+                            className="btn btn-primary w-100 mb-3"
+                            onClick={handleAddComment}
+                        >
+                            {commentLoading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Adding Comment...
+                                </>
+                            ) : 'Add Comment'}
+                        </button>
+                    </div>
+                </div>
+
             </div>
+
         </div>
     );
 }
