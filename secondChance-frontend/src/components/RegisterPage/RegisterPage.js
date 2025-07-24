@@ -43,6 +43,7 @@ function RegisterPage() {
             sessionStorage.setItem('auth-token', json.authtoken);
             sessionStorage.setItem('name', firstName);
             sessionStorage.setItem('email', json.email);
+            sessionStorage.setItem('surname',lastName);
             navigate('/app');
             setIsLoggedIn(true);
         }

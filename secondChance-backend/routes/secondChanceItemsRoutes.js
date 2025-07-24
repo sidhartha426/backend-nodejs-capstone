@@ -77,6 +77,37 @@ router.post('/', upload.single('file'), async (req, res, next) => {
     }
 });
 
+router.post('/:id/comments', async (req, res, next) => {
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection('secondChanceItems');
+        const id = req.params.id;
+        const secondChanceItem = await collection.findOne({ id });
+        if (!secondChanceItem) {
+            return res.status(404).send('secondChanceItem not found');
+        }
+        const { author, comment } = req.body;
+
+        const result = await collection.updateOne(
+            { id }, // match item by its string "id" field
+            {
+                $push: {
+                    comments: { author, comment }
+                }
+            }
+        );
+        if (result.modifiedCount > 0) {
+            res.status(201).json({ message: 'Comment added successfully' });
+        }
+        else {
+            res.status(500).json({ message: 'Couldn\'t add comment' });
+        }
+
+    } catch (e) {
+        next(e);
+    }
+});
+
 // Update and existing item
 router.put('/:id', async (req, res, next) => {
     try {

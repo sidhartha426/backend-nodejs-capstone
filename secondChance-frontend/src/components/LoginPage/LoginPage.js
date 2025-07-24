@@ -43,7 +43,7 @@ function LoginPage() {
             sessionStorage.setItem('auth-token', json.authtoken);
             sessionStorage.setItem('name', json.userName);
             sessionStorage.setItem('email', json.userEmail);
-
+            sessionStorage.setItem('surname',json.surName);
             navigate('/app');
             setIsLoggedIn(true);
         } else {

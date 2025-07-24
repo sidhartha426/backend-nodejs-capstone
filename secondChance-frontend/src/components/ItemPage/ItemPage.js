@@ -12,6 +12,8 @@ function ItemPage() {
     const [age_days, setAge_days] = useState(0);
     const [description, setDescription] = useState('');
     const [message, setMessage] = useState(null);
+    const [comment, setComment] = useState('');
+    const [loading, setLoading] = useState(false);
     const { isLoggedIn } = useAppContext();
 
     useEffect(() => {
@@ -21,6 +23,8 @@ function ItemPage() {
     });
 
     const handleAddItem = async () => {
+
+        setLoading(true);
 
         // Get the form data
         const formData = new FormData();
@@ -35,7 +39,14 @@ function ItemPage() {
         formData.append('age_years', (age_days / 365).toFixed(2));
         formData.append('description', document.getElementById('description').value);
         formData.append('image', `/images/${file.name}`);
-        formData.append('comments', []);
+        if (comment === '') {
+            formData.append('comments', JSON.stringify([]));
+        }
+        else {
+            const author = `${sessionStorage.getItem('name')} ${sessionStorage.getItem('surname')}`;
+            formData.append('comments', JSON.stringify([{ author, comment }]));
+        }
+
 
         try {
             let url = `${urlConfig.backendUrl}/api/secondchance/items`;
@@ -59,6 +70,7 @@ function ItemPage() {
         } catch (error) {
             setMessage(error.message);
         }
+        setLoading(false);
     }
 
     return (
@@ -130,14 +142,34 @@ function ItemPage() {
                                 id="description"
                                 cols="2"
                                 className="form-control"
-                                placeholder="Enter the  description"
+                                placeholder="Enter the description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="comment" className="form-label">Comment</label>
+                            <textarea
+                                id="comment"
+                                cols="2"
+                                className="form-control"
+                                placeholder="Enter the comment"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                        </div>
+
                         <input style={{ padding: '.5cm' }} type="file" id="file" name="file" accept=".jpg, .png, .gif" />
 
-                        <button className="btn btn-primary w-100 mb-3" onClick={handleAddItem}>Add Item</button>
+                        <button disabled={loading} className="btn btn-primary w-100 mb-3" onClick={handleAddItem}>
+                            {loading ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Adding Item...
+                                </>
+                            ):('Add Item')}
+                        </button>
 
                         <span style={{ color: 'green', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{message}</span>
 

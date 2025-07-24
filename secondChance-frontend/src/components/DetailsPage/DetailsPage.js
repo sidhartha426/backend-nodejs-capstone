@@ -46,13 +46,27 @@ function DetailsPage() {
         navigate(-1); // Navigates back to the previous page
     };
 
+    const handleDeleteClick = async () => {
+        const response = await fetch(`${urlConfig.backendUrl}/api/secondchance/items/${itemId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        await response.json();
+        navigate(-1); // Navigates back to the previous page
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
     if (!gift) return <div className="container mt-5">Gift not found</div>;
 
     return (
         <div className="container mt-5">
-            <button className="btn btn-secondary mb-3" onClick={handleBackClick}>Back</button>
+            <div className="d-flex justify-content-between mb-3">
+                <button className="btn btn-secondary" onClick={handleBackClick}>Back</button>
+                <button className="btn btn-danger" onClick={handleDeleteClick}>Delete</button>
+            </div>
             <div className="card product-details-card">
                 <div className="card-header text-white">
                     <h2 className="details-title">{gift.name}</h2>
