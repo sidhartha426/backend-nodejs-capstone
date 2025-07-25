@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
             // Create JWT authentication if passwords match
             const authtoken = jwt.sign(payload, JWT_SECRET);
             logger.info('User logged in successfully');
-            return res.status(200).json({ authtoken, userName, userEmail, surName});
+            return res.status(200).json({ authtoken, userName, userEmail, surName });
             // Send appropriate message if user not found
         } else {
             logger.error('User not found');

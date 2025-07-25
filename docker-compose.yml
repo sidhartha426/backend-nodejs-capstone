@@ -1,0 +1,41 @@
+services:
+  mongodb-service:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+    networks:
+      - app-network
+ 
+  secondchance-backend:
+    image: secondchance-backend
+    ports:
+      - "3060:3060"
+    environment:
+      - MONGO_URL=${MONGO_URL}
+    depends_on:
+      - mongodb-service
+    networks:
+      - app-network
+
+  secondchance-frontend:
+    image: secondchance-frontend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - secondchance-backend
+    networks:
+      - app-network
+
+  sentiment:
+    image: sentiment
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

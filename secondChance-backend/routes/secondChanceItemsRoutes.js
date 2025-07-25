@@ -5,7 +5,6 @@ const connectToDatabase = require('../models/db');
 const logger = require('../logger');
 const fs = require('fs').promises;
 
-
 // Define the upload directory path
 const directoryPath = 'public/images';
 
@@ -100,11 +99,9 @@ router.post('/:id/comments', async (req, res, next) => {
         );
         if (result.modifiedCount > 0) {
             res.status(201).json({ message: 'Comment added successfully' });
-        }
-        else {
+        } else {
             res.status(500).json({ message: 'Couldn\'t add comment' });
         }
-
     } catch (e) {
         next(e);
     }
@@ -159,8 +156,7 @@ router.delete('/:id', async (req, res, next) => {
             return res.status(404).json({ error: 'secondChanceItem not found' });
         }
         await collection.deleteOne({ id });
-        await fs.unlink('public'+secondChanceItem.image);
-
+        await fs.unlink('public' + secondChanceItem.image);
         res.json({ deleted: 'success' });
     } catch (e) {
         next(e);
